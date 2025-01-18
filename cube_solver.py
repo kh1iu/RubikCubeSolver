@@ -74,6 +74,34 @@ def pretty_print(state):
     )
 
 def _solve(state,  moves, depth, visited_state):
+    """
+    A method to check if a solved state can be reached from the input state within a given depth.
+
+    ARGUMENT:
+
+    states(str): starting exploration state.
+    moves(List[str]): a list (history) of moves from initial state to the starting exploration state.
+    depth(int): maximum depth to explore.
+    visited_state(Dict[str, int]): all the states (and its depth) visited so far
+
+    SUMMARY:
+
+    - First check if the starting exploration state is a solved state or not. If yes, then a solution
+    is found and return the moves.
+    - Then we check, and only continue the exploration, if the depth is greater than zero.
+    - [KEY STEP!!] Next, we check if the starting  state is already visited before and if previously
+    visitation has depth greater then the current depth. If so, then can stop the exploration of this
+    starting stage because it means we have already explore the same starting state before and explored
+    with greater depth. If we did not find soulution previously (with greater depth) then we won't find
+    a solution this time with less depth.
+    - We continue the exploration if either we have never seen (explore) the given starting state or
+    we will explore the starting state again but with a greater depth.
+    - We apply all possible moves to the starting state to get the next state, update (add) the moves
+    with the new move and recursively call _solve again with the new state and decresing the depth by 1.
+    (the application of each possible moves consumes one depth)
+    
+    """
+    
     if is_solved(state):
         return list(moves)
     if depth <= 0:
@@ -89,8 +117,28 @@ def _solve(state,  moves, depth, visited_state):
         # moves.pop()
         if result:
             return result
+    return
 
 def method_1(state):
+    """
+    A method for solving 2x2 Rubik's cube
+
+    ARGUMENT:
+
+    state: initial (scramble) state.
+
+    DEFINITION:
+    
+    Depth: the number of moves (with possible repeats) from initial state to current state
+
+    SUMMARY:
+
+    Itereating through an increasing number of depth one at a time and check if a solved
+    state can be reached from the initial (scramble) state for a given depth or less.
+    If a solution is found, a list of solution steps is returned; othereise, an empty
+    list is returned. We hard coded the maximum depth exploration to be 100.
+    """
+    
     visited_state = {}
     state = tuple(state)
     start_time = time.time()
@@ -104,6 +152,32 @@ def method_1(state):
 
 
 def method_2(state):
+    """
+    A method for solving 2x2 Rubik's cube
+
+    ARGUMENT:
+
+    state: initial (scramble) state.
+
+    SUMMARY:
+
+    A breadth-first-search (BFS) approach where we maintain two data structure:
+    
+    - 'to_explore': A FIFO queue of states and their moves fromt the initial scram state.
+    Initialize with the initial scramble state.
+    
+    - 'visited_state': A hash table of all visited state. Initiailly empty.
+
+    Repeatly take the first element ('current_state', 'current_moves') from the front of the
+    'to_explore' queue and check if it is a solved state. If yes, a solution is found and
+    return the solution 'current_moves'. If not, apply all possible moves to the the
+    'current_state' to arrive at set of 'next_state's and update with their corresponding moves,
+    called 'next_moves'. For each 'next_state', check if it is in the 'visited_state',
+    if yes then it means we have already visited this state before and don't need to explore again.
+    If not, then this is a new state and we will add this 'next_state' to the 'visited_state' set
+    and add this ('next_state', 'next_moves') to the back of the 'to_explore' queue.
+    """
+    
     visited_state = set()
     to_explore = [(state, [])] # format: [(state_0, []), ..., (state_i, [moves from state_0 to state_i]), ...]
     print("Think~~ing...")
